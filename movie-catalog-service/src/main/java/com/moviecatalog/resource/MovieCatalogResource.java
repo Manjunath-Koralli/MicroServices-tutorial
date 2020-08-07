@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.moviecatalog.model.CatalogItem;
 import com.moviecatalog.model.Movie;
-import com.moviecatalog.model.Rating;
+import com.moviecatalog.model.UserRating;
 
 @RestController
 @RequestMapping("/catalog")
@@ -28,37 +28,39 @@ public class MovieCatalogResource {
 	private WebClient.Builder webClientBuilder;
 	
 	//with REST TEMPLATE
-	/*@RequestMapping("/{userId}")
+	@RequestMapping("/{userId}")
 	public List<CatalogItem> getCatalog(@PathVariable("userId") String userId){
 		
-		
 		//get all rated movie IDs
-		
-		List<Rating> ratings = Arrays.asList(
+		/*List<Rating> ratings = Arrays.asList(
 			new Rating("1234","4"),
 			new Rating("5678","4")
-		);
-		//for each movie ID, call movie info service and get details
+		);*/
+		//Making a API call instead of hard coding ratings
+		UserRating ratings = restTemplate
+				.getForObject("http://localhost:8082/ratingsdata/users/" + userId, 
+						UserRating.class);
 		
-		return ratings.stream().map(rating -> {
+		
+		return ratings.getUserRating().stream().map(rating -> {
+			//for each movie ID, call movie info service and get details
 			Movie movie = restTemplate
 					.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), 
 							Movie.class);
+			
+			//Put them all together
 			return new CatalogItem(movie.getName(),"Test", rating.getRating());
 		}).collect(Collectors.toList());
-		//Put them all together
 		
-	}*/
+		
+	}
 	
 	//with WEB CLIENT
-	@RequestMapping("/{userId}")
+	/*@RequestMapping("/{userId}")
 	public List<CatalogItem> getCatalog(@PathVariable("userId") String userId){
 		//get all rated movie IDs
 		
-		List<Rating> ratings = Arrays.asList(
-			new Rating("1234","4"),
-			new Rating("5678","4")
-		);
+		
 		//for each movie ID, call movie info service and get details
 		
 		return ratings.stream().map(rating -> {
@@ -74,7 +76,7 @@ public class MovieCatalogResource {
 		//Put them all together
 		
 	
-	}
+	}*/
 			
 			
 			
